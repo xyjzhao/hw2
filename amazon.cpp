@@ -9,6 +9,10 @@
 #include "db_parser.h"
 #include "product_parser.h"
 #include "util.h"
+#include "book.h"
+#include "movie.h"
+#include "clothing.h"
+#include "mydatastore.h"
 
 using namespace std;
 struct ProdNameSorter {
@@ -29,7 +33,7 @@ int main(int argc, char* argv[])
      * Declare your derived DataStore object here replacing
      *  DataStore type to your derived type
      ****************/
-    DataStore ds;
+    MyDataStore ds;
 
 
 
@@ -70,6 +74,7 @@ int main(int argc, char* argv[])
         stringstream ss(line);
         string cmd;
         if((ss >> cmd)) {
+            // and
             if( cmd == "AND") {
                 string term;
                 vector<string> terms;
@@ -80,6 +85,7 @@ int main(int argc, char* argv[])
                 hits = ds.search(terms, 0);
                 displayProducts(hits);
             }
+            // or
             else if ( cmd == "OR" ) {
                 string term;
                 vector<string> terms;
@@ -90,6 +96,41 @@ int main(int argc, char* argv[])
                 hits = ds.search(terms, 1);
                 displayProducts(hits);
             }
+            // add 
+            else if (cmd == "ADD") {
+                string username;
+                int hitIndex;
+                if(!(ss >> username >> hitIndex)) {
+                    cout << "Invalid request" << endl;
+                }
+                else {
+                    bool success = ds.addToCart(username, hits, hitIndex);
+                    if(!success) {
+                        cout << "Invalid request" << endl;
+                    }
+                }
+            }
+            // viewcart
+            else if (cmd == "VIEWCART") {
+                string username;
+                if(!(ss >> username)) {
+                    cout << "Invalid username" << endl;
+                }
+                else {
+                    ds.viewCart(username);
+                }
+            }
+            // buycart
+            else if (cmd == "BUYCART") {
+                string username;
+                if(!(ss >> username)) {
+                    cout << "Invalid username" << endl;
+                }
+                else {
+                    ds.buyCart(username);
+                }
+            }
+            // quit
             else if ( cmd == "QUIT") {
                 string filename;
                 if(ss >> filename) {
